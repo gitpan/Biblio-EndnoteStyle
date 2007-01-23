@@ -1,0 +1,12 @@
+$Id: Changes,v 1.1.1.1 2007/01/23 09:26:00 mike Exp $
+
+Revision history for Perl extension Biblio::EndnoteStyle.
+
+0.01  Mon Jan 22 22:03:12 2007
+	- original version; created by h2xs 1.23 with options
+		-X --name=Biblio::EndnoteStyle --compat-version=5.6.0 --omit-constant --skip-exporter --skip-ppport
+	- This release is functional but incomplete: many, many more
+	  test cases are needed, and adding these will no doubt
+	  require fixes to the code.  Nevertheless, the module is
+	  useful as it stands.
+
