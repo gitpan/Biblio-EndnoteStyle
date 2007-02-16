@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 1.1.1.1 2007/01/23 09:26:00 mike Exp $
+# $Id: Makefile.PL,v 1.2 2007/02/15 23:52:08 mike Exp $
 
 use 5.006;
 use ExtUtils::MakeMaker;
@@ -11,4 +11,5 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Biblio/EndnoteStyle.pm', # retrieve abstract from module
        AUTHOR         => 'Mike Taylor <mike@miketaylor.org.uk>') : ()),
+    EXE_FILES    => [ 'bin/endnote-format' ],
 );

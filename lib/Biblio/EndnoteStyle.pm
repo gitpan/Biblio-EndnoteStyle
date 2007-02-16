@@ -1,4 +1,4 @@
-# $Id: EndnoteStyle.pm,v 1.1.1.1 2007/01/23 09:26:00 mike Exp $
+# $Id: EndnoteStyle.pm,v 1.4 2007/02/16 01:14:36 mike Exp $
 
 package Biblio::EndnoteStyle;
 
@@ -6,7 +6,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 =head1 NAME
 
@@ -50,8 +50,34 @@ sub new {
     my $class = shift();
 
     return bless {
+	debug => 0,
 	compiled => {},		# cache of compiled templates
     }, $class;
+}
+
+
+=head2 debug()
+
+ $olddebug = $style->debug(1);
+
+Turns debugging on or off and returns the old debugging status.  If an
+argument is provided, then debugging is turned either on or off
+according to whether then argument is true or false.  In any case, the
+old value of the debugging status is returned, so that a call with no
+argument is a side-effect-free inquiry.
+
+When debugging is turned on, compiled templates are dumped to standard
+error.  It is not pretty.
+
+=cut
+
+sub debug {
+    my $this = shift();
+    my($val) = @_;
+
+    my $old = $this->{debug};
+    $this->{debug} = $val if defined $val;
+    return $old;
 }
 
 
@@ -71,7 +97,7 @@ few special characters are used:
 
 =item ¬
 
-Link Adjacent words.  This is the "non-breaking space"
+Link adjacent words.  This is the "non-breaking space"
 described on page 418 of the EndNote X
 
 =item |
@@ -115,7 +141,8 @@ sub format {
     my $template = $this->{compiled}->{$text};
     if (!defined $template) {
 	my $errmsg;
-	($template, $errmsg) = Biblio::EndnoteStyle::Template->new($text);
+	($template, $errmsg) =
+	    Biblio::EndnoteStyle::Template->new($text, $this->{debug});
 	return (undef, $errmsg) if !defined $template;
 	#print "template '$text'\n", $template->render();
 	$this->{compiled}->{$text} = $template;
@@ -129,7 +156,7 @@ package Biblio::EndnoteStyle::Template;
 
 sub new {
     my $class = shift();
-    my($text) = @_;
+    my($text, $debug) = @_;
 
     my @sequences;
     while ($text ne "") {
@@ -140,10 +167,13 @@ sub new {
 	$text =~ s/^\|//;
     }
 
-    return bless {
+    my $this = bless {
 	text => $text,
 	sequences => \@sequences,
     }, $class;
+    print STDERR $this->render() if $debug;
+
+    return $this;
 }
 
 sub render {
@@ -185,6 +215,7 @@ sub new {
     my($text) = @_;
 
     my $tail = $text;
+    $tail =~ s/¬/ /g;
     my @tokens;
     while ($tail =~ s/(.*?)([a-z_]+)//i) {
 	my($head, $word) = ($1, $2);

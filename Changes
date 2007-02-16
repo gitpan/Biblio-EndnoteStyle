@@ -1,6 +1,15 @@
-$Id: Changes,v 1.1.1.1 2007/01/23 09:26:00 mike Exp $
+$Id: Changes,v 1.4 2007/02/16 01:16:48 mike Exp $
 
 Revision history for Perl extension Biblio::EndnoteStyle.
+
+0.02  Fri Feb 16 01:16:32 GMT 2007
+	- Properly implement non-breaking space "¬", which was
+	  previously rendered as a literal.
+	- Add debug() method to the formatter, causing compiled
+	  templates to be dumped to standard error.
+	- Add command-line script "bin/endnote-format", to allow the
+	  library to be simply exercised.
+	- Improvements to documentation.
 
 0.01  Mon Jan 22 22:03:12 2007
 	- original version; created by h2xs 1.23 with options
