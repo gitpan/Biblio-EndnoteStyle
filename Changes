@@ -1,10 +1,26 @@
-$Id: Changes,v 1.4 2007/02/16 01:16:48 mike Exp $
+$Id: Changes,v 1.10 2007/03/14 11:14:33 mike Exp $
 
 Revision history for Perl extension Biblio::EndnoteStyle.
+
+0.04  Wed Mar 14 11:14:57 GMT 2007
+	- Templates may now contain |-separated components consisting
+	  only of whitespace.  (That they couldn't previously was a
+	  bug.)
+	- Templates now correctly interpret backquotes surrounding a
+	  word for force its interpretation as a literal rather than a
+	  fieldname.
+	- Much better test-suite.
+
+0.03  Sat Feb 17 22:09:38 GMT 2007
+	- Downgrade "use 5.008" in lib/Biblio/EndnoteStyle.pm to
+	  5.006, to match what's specified in Makefile.PL.
 
 0.02  Fri Feb 16 01:16:32 GMT 2007
 	- Properly implement non-breaking space "¬", which was
 	  previously rendered as a literal.
+	- Tweak the rules so that a field that exists but is undefined
+	  in the data hash is treated as an absent field rather than a
+	  literal.
 	- Add debug() method to the formatter, causing compiled
 	  templates to be dumped to standard error.
 	- Add command-line script "bin/endnote-format", to allow the

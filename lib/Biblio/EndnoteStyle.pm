@@ -1,12 +1,12 @@
-# $Id: EndnoteStyle.pm,v 1.4 2007/02/16 01:14:36 mike Exp $
+# $Id: EndnoteStyle.pm,v 1.8 2007/03/14 11:12:31 mike Exp $
 
 package Biblio::EndnoteStyle;
 
-use 5.008;
+use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 =head1 NAME
 
@@ -108,11 +108,13 @@ Forced Seperation of elements that would otherwise be dependent.
 
 Separator for singular/plural aternatives.
 
-=back
+=cut `
 
-In addition to these special characters, backquotes may be used to
-prevent literal text from being interpreted as a fieldname.
-(### Is this in fact true?  If not, I ought to implement it.)
+=item `
+
+Used to prevent literal text from being interpreted as a fieldname.
+
+=back
 
 The hash of fields is passed by reference: keys are fieldnames, and
 the corresponding values are the data.  PLEASE NOTE AN IMPORTANT
@@ -160,11 +162,14 @@ sub new {
 
     my @sequences;
     while ($text ne "") {
-	$text =~ s/^(\s*[^\s|]+\s?)//;
-	my $sequence = $1;
-	my $obj = Biblio::EndnoteStyle::Sequence->new($sequence);
-	push @sequences, $obj;
-	$text =~ s/^\|//;
+	if ($text =~ s/^(\s*[^\s|]*\s?)//) {
+	    my $sequence = $1;
+	    my $obj = Biblio::EndnoteStyle::Sequence->new($sequence);
+	    push @sequences, $obj;
+	    $text =~ s/^\|//;
+	} else {
+	    die "unparseable template fragment '$text'";
+	}
     }
 
     my $this = bless {
@@ -214,13 +219,19 @@ sub new {
     my $class = shift();
     my($text) = @_;
 
+    use Carp;
+    confess("new($class) with text undefined") if !defined $text;
     my $tail = $text;
     $tail =~ s/¬/ /g;
     my @tokens;
-    while ($tail =~ s/(.*?)([a-z_]+)//i) {
+    while ($tail =~ s/(.*?)([``a-z_]+)//i) {
 	my($head, $word) = ($1, $2);
 	push @tokens, [ LITERAL, $head ] if $head ne "";
-	push @tokens, [ WORD, $word ];
+	if ($word =~ s/^`(.*)`$/$1/) {
+	    push @tokens, [ LITERAL, $word ];
+	} else {
+	    push @tokens, [ WORD, $word ];
+	}
     }
     push @tokens, [ LITERAL, $tail ] if $tail ne "";
 
@@ -255,6 +266,8 @@ sub format {
 	} else {
 	    my $dval = $data->{$val};
 	    $dval = $data->{lc($val)} if !defined $dval;
+	    $dval = "" if !defined $dval && (exists $data->{$val} ||
+					     exists $data->{lc($val)});
 	    if (!defined $dval) {
 		# The word is not a fieldname at all: treat as a literal
 		#print "!defined \$dval\n";
