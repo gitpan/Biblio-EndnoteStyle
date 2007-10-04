@@ -1,4 +1,4 @@
-# $Id: EndnoteStyle.pm,v 1.8 2007/03/14 11:12:31 mike Exp $
+# $Id: EndnoteStyle.pm,v 1.10 2007/10/04 00:07:03 mike Exp $
 
 package Biblio::EndnoteStyle;
 
@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 =head1 NAME
 
@@ -224,7 +224,7 @@ sub new {
     my $tail = $text;
     $tail =~ s/¬/ /g;
     my @tokens;
-    while ($tail =~ s/(.*?)([``a-z_]+)//i) {
+    while ($tail =~ s/(.*?)([``a-z_0-9]+)//i) {
 	my($head, $word) = ($1, $2);
 	push @tokens, [ LITERAL, $head ] if $head ne "";
 	if ($word =~ s/^`(.*)`$/$1/) {
@@ -279,6 +279,8 @@ sub format {
 	    } else {
 		#print "$dval eq '$dval'\n";
 		$gotField = 1;
+		# Loathesome but useful special case
+		$dval = "http://$dval" if $val eq "URL" && $dval !~ /^[a-z]+:/;
 		$result .= $dval;
 	    }
 	}
